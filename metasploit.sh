@@ -55,7 +55,7 @@ pkg upgrade -y -o Dpkg::Options::="--force-confnew"
 # needs binutils
 pkg install -y binutils python autoconf bison clang coreutils curl findutils apr apr-util postgresql openssl readline libffi libgmp libpcap libsqlite libgrpc libtool libxml2 libxslt ncurses make ncurses-utils ncurses git wget unzip zip tar termux-tools termux-elf-cleaner pkg-config git ruby -o Dpkg::Options::="--force-confnew"
 
-python3 -m pip install --upgrade pip
+#python3 -m pip install --upgrade pip
 python3 -m pip install requests
 
 
@@ -64,6 +64,10 @@ python3 -m pip install requests
 echo
 center "*** Fix ruby BigDecimal"
 source <(curl -sL https://github.com/termux/termux-packages/files/2912002/fix-ruby-bigdecimal.sh.txt)
+
+echo
+center "*** Creating opt directory..."
+mkdir $PREFIX/opt
 
 echo
 center "*** Erasing old metasploit folder..."
@@ -77,6 +81,10 @@ git clone https://github.com/rapid7/metasploit-framework.git --depth=1
 echo
 center "*** Installation..."
 cd $PREFIX/opt/metasploit-framework
+
+# fix bundler error
+sed 's/2.1.4/2.4.14/' -i Gemfile.lock
+
 # sed '/rbnacl/d' -i Gemfile.lock
 # sed '/rbnacl/d' -i metasploit-framework.gemspec
 
@@ -114,19 +122,19 @@ ln -s $PREFIX/opt/metasploit-framework/msfrpcd $PREFIX/bin/
 
 termux-elf-cleaner $PREFIX/lib/ruby/gems/*/gems/pg-*/lib/pg_ext.so
 
-echo
-center "*"
-echo -e "\033[32m Suppressing Warnings\033[0m"
+#echo
+#center "*"
+#echo -e "\033[32m Suppressing Warnings\033[0m"
 
 # sed -i '355 s/::Exception, //' $PREFIX/bin/msfvenom
 # sed -i '481, 483 {s/^/#/}' $PREFIX/bin/msfvenom
 
-
 # sed -Ei "s/(\^\\\c\s+)/(\^\\\C-\\\s)/" $PREFIX/opt/metasploit-framework/lib/msf/core/exploit/remote/vim_soap.rb
 
-# Warning occurs during payload generation
-sed -i '86 {s/^/#/};96 {s/^/#/}' $PREFIX/lib/ruby/gems/3.1.0/gems/concurrent-ruby-1.0.5/lib/concurrent/atomic/ruby_thread_local_var.rb
-sed -i '442, 476 {s/^/#/};436, 438 {s/^/#/}' $PREFIX/lib/ruby/gems/3.1.0/gems/logging-2.3.1/lib/logging/diagnostic_context.rb
+# I dont see any warning during payload creation so maybe it has heen fixed
+# Warning occurs during payload generation 
+#sed -i '86 {s/^/#/};96 {s/^/#/}' $PREFIX/lib/ruby/gems/3.1.0/gems/concurrent-ruby-1.0.5/lib/concurrent/atomic/ruby_thread_local_var.rb
+#sed -i '442, 476 {s/^/#/};436, 438 {s/^/#/}' $PREFIX/lib/ruby/gems/3.1.0/gems/logging-2.3.1/lib/logging/diagnostic_context.rb
 
 ## openssl issue has been fixed 
 
